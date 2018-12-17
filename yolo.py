@@ -7,7 +7,7 @@ Run a YOLO_v3 style detection model on test images.
 import colorsys
 import os
 import random
-from timeit import time
+import time
 from timeit import default_timer as timer  ### to calculate FPS
 
 import numpy as np
@@ -86,7 +86,8 @@ class YOLO(object):
         #print(image_data.shape)
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
-        
+
+        start_time = time.time()
         out_boxes, out_scores, out_classes = self.sess.run(
             [self.boxes, self.scores, self.classes],
             feed_dict={
@@ -94,6 +95,8 @@ class YOLO(object):
                 self.input_image_shape: [image.size[1], image.size[0]],
                 K.learning_phase(): 0
             })
+        print('%.4f ms' % ((time.time() - start_time) * 1000))
+
         return_boxs = []
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = self.class_names[c]
